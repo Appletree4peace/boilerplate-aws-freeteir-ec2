@@ -1,0 +1,2 @@
+[remote]
+vultr ansible_host=aws_ec2 ansible_connection=ssh

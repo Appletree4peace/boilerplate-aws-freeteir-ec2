@@ -1,0 +1,45 @@
+---
+- name: Install required packages
+  dnf:
+    name:
+      - net-tools
+      - python3-pip
+      - docker
+      - git
+      - jq
+      - make
+    state: present
+
+- name: Start and enable Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ec2-user to docker group
+  user:
+    name: ec2-user
+    groups: docker
+    append: yes
+
+- name: Get uname -s
+  command: uname -s
+  register: uname_s
+
+- name: Get uname -m
+  command: uname -m
+  register: uname_m
+
+- name: Install docker-compose
+  command: curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ uname_s.stdout }}-{{ uname_m.stdout }}" -o /usr/local/bin/docker-compose 
+
+- name: Change docker-compose permissions
+  command: chmod +x /usr/local/bin/docker-compose
+
+- name: Copy local id_rsa.vultr to remote host
+  copy:
+    src: ~/.ssh/id_rsa
+    dest: /home/ec2-user/.ssh/id_rsa
+    owner: ec2-user
+    group: ec2-user
+    mode: 0600

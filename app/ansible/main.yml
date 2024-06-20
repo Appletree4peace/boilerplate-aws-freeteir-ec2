@@ -1,0 +1,12 @@
+---
+- name: Execute roles based on passed in variables
+  hosts: remote
+  become: true
+  gather_facts: no
+  vars:
+    ansible_connection: ssh
+  tasks:
+    - name: Include selected roles
+      include_role:
+        name: "{{ item }}"
+      loop: "{{ selected_roles }}"
